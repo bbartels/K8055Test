@@ -20,9 +20,11 @@ But if you prefer to build the library yourself I provided instructions below:
 Type the following in the Visual Studio Commandline:
 ```cmd
 > git clone https://github.com/bbartels/K8055Test.git
-> msbuild.exe K8055Test\K8055Test.sln /p:Configuration=Release
+> msbuild.exe K8055Test\K8055Test\.sln /p:Configuration=Release
+> move PATH_TO_K8055D.dll K8055Test\K8055Test\bin\Release
+> K8055Test\K8055Test\bin\Release\K8055.exe
 ```
-Alternatively you can open the solutions in Visual Studio and compile there.
+Alternatively you can open the solution in Visual Studio and compile it there.
 
 ## License
 
