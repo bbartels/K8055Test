@@ -1,0 +1,155 @@
+﻿<!-- The UI is intended to look like Velleman's provided K8055Demo program. If this violates any licence, please let me know and I take it down. -->
+<Window x:Class="K8055Test.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:K8055Test"
+        mc:Ignorable="d"
+        Title="K8055Test" Height="360" Width="650" Closing="MainWindowClosing" ResizeMode="NoResize" WindowStyle="ToolWindow">
+    <Window.Resources>
+        <Style x:Key="ProcedureButtons" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <EventSetter Event="Click" Handler="K8055ButtonClick"/>
+        </Style>
+        <Style x:Key="AnalogOutputSlider" TargetType="{x:Type Slider}">
+            <Setter Property="Height" Value="27"/>
+            <Setter Property="Width" Value="261"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="255"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="SmallChange" Value="1"/>
+            <Setter Property="TickFrequency" Value="5"/>
+            <EventSetter Event="ValueChanged" Handler="K8055AnalogOutputSliderValueChanged"/>  
+        </Style>
+
+        <Style x:Key="AnalogInputProgressBar" TargetType="{x:Type ProgressBar}">
+            <Setter Property="Height" Value="27"/>
+            <Setter Property="Width" Value="259"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="255"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        </Style>
+
+        <Style x:Key="DigitalOutputCheckBox" TargetType="{x:Type CheckBox}">
+            <EventSetter Event="Checked" Handler="K8055OutputCheckboxChecked"/>
+            <EventSetter Event="Unchecked" Handler="K8055OutputCheckboxUnchecked"></EventSetter>
+        </Style>
+
+        <Style x:Key="DebounceStyle" TargetType="{x:Type Control}">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Width" Value="115"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <GroupBox Height="50" Width="105" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 10, 0, 0">
+            <GroupBox.Header>
+                <Label>CardAddress</Label>
+            </GroupBox.Header>
+            <Canvas>
+                <CheckBox x:Name="K8055SK5Checkbox" Content="SK5" IsChecked="True"/>
+                <CheckBox x:Name="K8055SK6Checkbox" Content="SK6" Canvas.Left="55" IsChecked="True"/>
+            </Canvas>
+        </GroupBox>
+
+        <Label x:Name="K8055ConnectLabel" Content="..." Margin="10,90,515,203"/>
+        <Button x:Name="K8055ConnectButton"         Style="{StaticResource ProcedureButtons}" Content="Connect"           Margin="10, 65, 0, 0"/>
+        <Button x:Name="K8055DisconnectButton"      Style="{StaticResource ProcedureButtons}" Content="Disconnect"        Margin="10,113, 0, 0"/>
+        <Button x:Name="K8055SetAllDigitalButton"   Style="{StaticResource ProcedureButtons}" Content="Set All Digital"   Margin="10,167, 0, 0"/>
+        <Button x:Name="K8055ClearAllDigitalButton" Style="{StaticResource ProcedureButtons}" Content="Clear All Digital" Margin="10,197, 0, 0"/>
+        <Button x:Name="K8055SetAllAnalogButton"    Style="{StaticResource ProcedureButtons}" Content="Set All Analog"    Margin="10,227, 0, 0"/>
+        <Button x:Name="K8055ClearAllAnalogButton"  Style="{StaticResource ProcedureButtons}" Content="Clear All Analog"  Margin="10,257, 0, 0"/>
+        <Button x:Name="K8055OutputTestButton"      Style="{StaticResource ProcedureButtons}" Content="Output Test"       Margin="10,287, 0, 0"/>
+
+        <GroupBox Height="297" Width="70" Margin="134,15,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <GroupBox.Header>
+                <Label>DAC</Label>
+            </GroupBox.Header>
+            <Canvas x:Name="K8055AnalogOutputCanvas">
+                <Slider x:Name="K8055AnalogOutputSlider1" Style="{StaticResource AnalogOutputSlider}" Canvas.Left="-114" Canvas.Top="118" TickPlacement="TopLeft">
+                    <Slider.RenderTransform>
+                        <RotateTransform Angle="270"/>
+                    </Slider.RenderTransform>
+                </Slider>
+                <Slider x:Name="K8055AnalogOutputSlider2" Style="{StaticResource AnalogOutputSlider}" Canvas.Left="-84" Canvas.Top="118" TickPlacement="BottomRight">
+                    <Slider.RenderTransform>
+                        <RotateTransform Angle="270"/>
+                    </Slider.RenderTransform>
+                </Slider>
+            </Canvas>
+        </GroupBox>
+        <GroupBox Height="297" Width="95" Margin="220,15,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <GroupBox.Header>
+                <Label>ADC</Label>
+            </GroupBox.Header>
+            <Canvas x:Name="K8055AnalogInputCanvas">
+                <ProgressBar x:Name="K8055AnalogInputProgressBar1" Style="{StaticResource AnalogInputProgressBar}" Canvas.Left="-113" Canvas.Top="117">
+                    <ProgressBar.RenderTransform>
+                        <RotateTransform Angle="270"/>
+                    </ProgressBar.RenderTransform>
+                </ProgressBar>
+                <ProgressBar x:Name="K8055AnalogInputProgressBar2" Style="{StaticResource AnalogInputProgressBar}" Canvas.Left="-63" Canvas.Top="116">
+                    <ProgressBar.RenderTransform>
+                        <RotateTransform Angle="270"/>
+                    </ProgressBar.RenderTransform>
+                </ProgressBar>
+            </Canvas>
+        </GroupBox>
+
+        <GroupBox Height="55" Width="185" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="328,15,0,0">
+            <GroupBox.Header>
+                <Label>Inputs</Label>
+            </GroupBox.Header>
+            <Canvas x:Name="K8055DigitalInputCanvas" Margin="0,0,107,0" >
+                <CheckBox x:Name="K8055DigitalInputCheckbox1" Canvas.Left="5"   Canvas.Top="0" Content="1" IsEnabled="False"/>
+                <CheckBox x:Name="K8055DigitalInputCheckbox2" Canvas.Left="40"  Canvas.Top="0" Content="2" IsEnabled="False"/>
+                <CheckBox x:Name="K8055DigitalInputCheckbox3" Canvas.Left="75"  Canvas.Top="0" Content="3" IsEnabled="False"/>
+                <CheckBox x:Name="K8055DigitalInputCheckbox4" Canvas.Left="110" Canvas.Top="0" Content="4" IsEnabled="False"/>
+                <CheckBox x:Name="K8055DigitalInputCheckbox5" Canvas.Left="145" Canvas.Top="0" Content="5" IsEnabled="False"/>
+            </Canvas>
+        </GroupBox>
+        <GroupBox Height="55" Width="290" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="328,75,0,0">
+            <GroupBox.Header>
+                <Label>Outputs</Label>
+            </GroupBox.Header>
+            <Canvas x:Name="K8055DigitalOutputCanvas">
+                <CheckBox x:Name="K8055DigitalOutputCheckbox1" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="5"   Canvas.Top="0" Content="1" />
+                <CheckBox x:Name="K8055DigitalOutputCheckbox2" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="40"  Canvas.Top="0" Content="2"/>
+                <CheckBox x:Name="K8055DigitalOutputCheckbox3" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="75"  Canvas.Top="0" Content="3"/>
+                <CheckBox x:Name="K8055DigitalOutputCheckbox4" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="110" Canvas.Top="0" Content="4"/>
+                <CheckBox x:Name="K8055DigitalOutputCheckbox5" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="145" Canvas.Top="0" Content="5"/>
+                <CheckBox x:Name="K8055DigitalOutputCheckbox6" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="180" Canvas.Top="0" Content="6"/>
+                <CheckBox x:Name="K8055DigitalOutputCheckbox7" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="215" Canvas.Top="0" Content="7"/>
+                <CheckBox x:Name="K8055DigitalOutputCheckbox8" Style="{StaticResource DigitalOutputCheckBox}" Canvas.Left="250" Canvas.Top="0" Content="8"/>
+            </Canvas>
+        </GroupBox>
+
+        <GroupBox Height="177" Width="135" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="328,135,0,0">
+            <GroupBox.Header>
+                <Label>Counter 1</Label>
+            </GroupBox.Header>
+            <Canvas x:Name="K8055Counter1Canvas">
+                <TextBox x:Name="K8055Counter1TextBox"     Style="{StaticResource DebounceStyle}" Canvas.Left="4" Canvas.Top="0" IsEnabled="False"/>
+                <TextBox x:Name="K8055SetDebounce1TextBox" Style="{StaticResource DebounceStyle}" Canvas.Left="4" Canvas.Top="75"/>
+                <Button  x:Name="K8055Counter1ResetButton" Style="{StaticResource DebounceStyle}" Canvas.Left="4" Canvas.Top="40"  Content="Reset"             Click="K8055CounterResetButtonClick"/>
+                <Button  x:Name="K8055SetDebounce1Button"  Style="{StaticResource DebounceStyle}" Canvas.Left="4" Canvas.Top="108" Content="Set Debounce Time" Click="K8055SetDebounceButtonClick" />
+            </Canvas>
+        </GroupBox>
+        <GroupBox Height="177" Width="135" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="483,135,0,0">
+            <GroupBox.Header>
+                <Label>Counter 2</Label>
+            </GroupBox.Header>
+            <Canvas x:Name="K8055Counter2Canvas">
+                <TextBox x:Name="K8055Counter2TextBox"     Style="{StaticResource DebounceStyle}"   Canvas.Left="4" IsEnabled="False"/>
+                <TextBox x:Name="K8055SetDebounce2TextBox" Style="{StaticResource DebounceStyle}"   Canvas.Left="4" Canvas.Top="75"/>
+                <Button x:Name="K8055Counter2ResetButton"  Style="{StaticResource DebounceStyle}"   Canvas.Left="4" Canvas.Top="40" Content="Reset" Click="K8055CounterResetButtonClick"/>
+                <Button x:Name="K8055SetDebounce2Button"   Style="{StaticResource DebounceStyle}"   Canvas.Left="4" Canvas.Top="108" Content="Set Debounce Time" Click="K8055SetDebounceButtonClick"/>
+            </Canvas>
+        </GroupBox>
+    </Grid>
+</Window>
